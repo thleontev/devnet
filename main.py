@@ -12,8 +12,8 @@ dev_ip = ["10.10.11.100", "10.10.11.101", "10.10.11.102",
 dev_soft = {'3750G-48PS-S':'c3750-ipbasek9-mz.122-55.SE12.bin',
             '3750G-24TS-1U':'c3750-ipservicesk9-mz.150-2.SE11.bin'}
 
-dev_script = {'3750G-48PS-S':'script3750',
-            '3750G-24TS-1U':'script3750'}
+dev_script = {'3750G-48PS-S':'py3750',
+            '3750G-24TS-1U':'py3750'}
 
 devices = []
 
@@ -31,7 +31,7 @@ class cdevice(telnetlib.Telnet):
         telnetlib.Telnet.__init__(self)
 
     def __del__(self):
-        pass
+        super().__del__()
 
     def open(self):
         super().open(self.ip_add, 23, 1)
