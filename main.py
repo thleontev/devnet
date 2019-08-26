@@ -19,34 +19,53 @@ devices = []
 
 class cdevice(telnetlib.Telnet):
     ip_add = ""
-    line = 0
+    pos = 0
     link = "none"
     model = "none"
+    software = "none"
     status = "none"
     update_ios = False
+
     def __init__(self, ip_add):
         self.ip_add = ip_add
         telnetlib.Telnet.__init__(self)
+
+    def __del__(self):
         pass
+
+    def open(self):
+        super().open(self.ip_add, 23, 1)
+
 
 # initiation loop
 for i in range(DEV_COUNT):
     devices.append(cdevice(dev_ip[i]))
-    devices[i].open()
 
-    # find model
+    # connect to device
+    try:
+        devices[i].open()
+    except:
+        continue
+
+    # find model and software version
     devices[i].write("sh inv")
     time.sleep(0.5)
     res = devices[i].read_very_eager()
+    for key in dev_soft:
+        if res.find(key) != -1:
+            devices[i].software = dev_soft[key]
+            devices[i].model = key
+            try:
+                devices[i].link = open(dev_script[key], 'r', encoding="utf-8")
+            except:
+                continue
 
-    # check software
+    # check software version
     devices[i].write("sh ver")
     time.sleep(0.5)
     res = devices[i].read_very_eager()
-    devices[i].update_ios = True
-
-    print(devices[i].ip_add, devices[i].model, devices[i].status)
-    devices[i].close()
+    if res.find(devices[i].software) == -1:
+        devices[i].update_ios = True
 
 '''
 # main loop
@@ -55,7 +74,7 @@ src_count = 0
 while not fl_end:
     # command loop
     for i in range(DEV_COUNT):
-        fl_end = False
+        pass
 
 
     # print report
