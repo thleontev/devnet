@@ -1,19 +1,28 @@
 import getpass
 import telnetlib, time
 
-DEV_COUNT = 1
+DEV_COUNT = 3
 DELAY_SCR = 1000
 TFTP_SERVER = "10.10.11.3"
-dev_ip = ["10.10.11.100", "10.10.11.101", "10.10.11.102",
+PASS_STD = "cisco"
+
+DELAY = 0.5
+dev_ip = ["172.31.1.150", "172.31.1.151", "172.31.1.152",
           "10.10.11.103", "10.10.11.104", "10.10.11.105",
           "10.10.11.106", "10.10.11.107", "10.10.11.108",
           "10.10.11.109"]
 
 dev_soft = {'3750G-48PS-S':'c3750-ipbasek9-mz.122-55.SE12.bin',
-            '3750G-24TS-1U':'c3750-ipservicesk9-mz.150-2.SE11.bin'}
+            '3750G-24TS-1U':'c3750-ipservicesk9-mz.150-2.SE11.bin',
+            'C3745-2FE':'c3750-ipservicesk9-mz.150-2.SE11.bin',
+            'CISCO7206VXR': 'c3750-ipservicesk9-mz.150-2.SE11.bin',
+            '3640 chassis': 'c3750-ipservicesk9-mz.150-2.SE11.bin'}
 
-dev_script = {'3750G-48PS-S':'py3750',
-            '3750G-24TS-1U':'py3750'}
+dev_script = {'3750G-48PS-S':'dn3750',
+            '3750G-24TS-1U':'dn3750',
+            'C3745-2FE':'dn3750',
+            'CISCO7206VXR':'dn3750',
+            '3640 chassis':'dn3750'}
 
 devices = []
 
@@ -34,7 +43,7 @@ class cdevice(telnetlib.Telnet):
         super().__del__()
 
     def open(self):
-        super().open(self.ip_add, 23, 1)
+        super().open(self.ip_add, 23, 5)
 
 
 # initiation loop
@@ -47,10 +56,22 @@ for i in range(DEV_COUNT):
     except:
         continue
 
+    #check auth
+    devices[i].write(b"\n")
+    time.sleep(DELAY)
+    res = str(devices[i].read_very_eager())
+    if res.find("Password:") != -1:
+        devices[i].write(PASS_STD.encode('ascii')+b"\n")
+        time.sleep(DELAY)
+        res = str(devices[i].read_very_eager())
+        if res.find(">") | res.find("=") == -1:
+            #error auth
+            pass
+
     # find model and software version
-    devices[i].write("sh inv")
-    time.sleep(0.5)
-    res = devices[i].read_very_eager()
+    devices[i].write(b"sh inv \n")
+    time.sleep(DELAY)
+    res = str(devices[i].read_very_eager())
     for key in dev_soft:
         if res.find(key) != -1:
             devices[i].software = dev_soft[key]
@@ -61,11 +82,17 @@ for i in range(DEV_COUNT):
                 continue
 
     # check software version
-    devices[i].write("sh ver")
-    time.sleep(0.5)
-    res = devices[i].read_very_eager()
+    devices[i].write(b"sh ver \n")
+    time.sleep(DELAY)
+    res = str(devices[i].read_very_eager())
     if res.find(devices[i].software) == -1:
         devices[i].update_ios = True
+        devices[i].status = "configure header"
+# debug
+print("######## status report ########")
+print("IP address", "Model", "Software")
+for i in range(DEV_COUNT):
+    print(devices[i].ip_add, devices[i].model, devices[i].status)
 
 '''
 # main loop
