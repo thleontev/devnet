@@ -1,11 +1,13 @@
-import getpass
-import telnetlib, time
+import telnetlib
+import time
+import re
+import textfsm
 
 DEV_COUNT = 3
 DELAY_SCR = 1000
 TFTP_SERVER = "10.10.11.3"
-PASS_STD = "cisco"
-
+PASS_AUTH = "cisco"
+PASS_ENA = "cisco"
 DELAY = 0.5
 dev_ip = ["172.31.1.150", "172.31.1.151", "172.31.1.152",
           "10.10.11.103", "10.10.11.104", "10.10.11.105",
@@ -46,88 +48,70 @@ class cdevice(telnetlib.Telnet):
         super().open(self.ip_add, 23, 5)
 
 
-# initiation loop
-for i in range(DEV_COUNT):
-    devices.append(cdevice(dev_ip[i]))
+i =0
+devices.append(cdevice(dev_ip[i]))
 
-    # connect to device
-    try:
-        devices[i].open()
-    except:
-        continue
+# connect to device
+try:
+    devices[i].open()
+except:
+    pass
 
-    #check auth
-    devices[i].write(b"\n")
+#check init config
+time.sleep(DELAY)
+res = devices[i].read_very_eager().decode('utf-8')
+if re.search('initial configuration', res):
+    devices[i].write(b"no\n")
     time.sleep(DELAY)
-    res = str(devices[i].read_very_eager())
-    if res.find("Password:") != -1:
-        devices[i].write(PASS_STD.encode('ascii')+b"\n")
-        time.sleep(DELAY)
-        res = str(devices[i].read_very_eager())
-        if res.find(">") | res.find("=") == -1:
-            #error auth
-            pass
+    res = devices[i].read_very_eager().decode('utf-8')
+    if re.search('.+[>]', res) is None:
+        devices[i].status = "error_auth_vty"
 
-    # find model and software version
-    devices[i].write(b"sh inv \n")
+#check auth to vty
+devices[i].write(b"\n")
+time.sleep(DELAY)
+res = devices[i].read_very_eager().decode('utf-8')
+if re.search('Password:', res):
+    devices[i].write(PASS_AUTH.encode('ascii')+b"\n")
     time.sleep(DELAY)
-    res = str(devices[i].read_very_eager())
-    for key in dev_soft:
-        if res.find(key) != -1:
-            devices[i].software = dev_soft[key]
-            devices[i].model = key
-            try:
-                devices[i].link = open(dev_script[key], 'r', encoding="utf-8")
-            except:
-                continue
+    res = devices[i].read_very_eager().decode('utf-8')
+    if re.search('.+[>]', res) is None:
+        devices[i].status = "error_auth_vty"
 
-    # check software version
-    devices[i].write(b"sh ver \n")
+
+# check auth to enable
+devices[i].write(b"en\n")
+time.sleep(DELAY)
+res = devices[i].read_very_eager().decode('utf-8')
+if re.search('Password:', res):
+    devices[i].write(PASS_ENA.encode('ascii') + b"\n")
     time.sleep(DELAY)
-    res = str(devices[i].read_very_eager())
-    if res.find(devices[i].software) == -1:
-        devices[i].update_ios = True
-        devices[i].status = "configure header"
+    res = devices[i].read_very_eager().decode('utf-8')
+    if re.search('.+[#]', res) is None:
+        devices[i].status = "error_auth_enable"
+    else:
+        devices[i].status = "auth_success"
+
+# find device mode
+devices[i].write(b"sh inv \n")
+time.sleep(DELAY)
+res = devices[i].read_very_eager().decode('utf-8')
+template = open('cisco_ios_show_inventory.template')
+fsm = textfsm.TextFSM(template)
+result = fsm.ParseText(res)
+devices[i].model = result[0][1]
+
+# find software version
+devices[i].write(b"sh ver \n")
+time.sleep(DELAY)
+res = devices[i].read_very_eager().decode('utf-8')
+template = open('cisco_ios_show_version.template')
+fsm = textfsm.TextFSM(template)
+result = fsm.ParseText(res)
+devices[i].software = result[0][6]
+
 # debug
 print("######## status report ########")
-print("IP address", "Model", "Software")
-for i in range(DEV_COUNT):
-    print(devices[i].ip_add, devices[i].model, devices[i].status)
+print("IP address", "Model", "Software", "Status")
+print(devices[i].ip_add, devices[i].model, devices[i].status)
 
-'''
-# main loop
-fl_end = False
-src_count = 0
-while not fl_end:
-    # command loop
-    for i in range(DEV_COUNT):
-        pass
-
-
-    # print report
-    src_count = src_count + 1
-    if src_count > DELAY_SCR:
-        print("######## status report ########")
-        src_count = 0
-        for i in range(DEV_COUNT):
-            print(devices[i].ip_add, devices[i].model, devices[i].status)
-
-for i in range(DEV_COUNT):
-    devices[i].close()
-
-#tn = telnetlib.Telnet(HOST)
-
-#tn.read_until(b"Username: ")
-#tn.write(user.encode('ascii') + b"\n")
-
-#tn.write(b"sh ver\n")
-#time.sleep(0.5)
-#print(tn.read_very_eager())
-#while True:
-#    line = tn.read_some()  # Read one line
-#    print(line)
-
-#tn.write(b"exit\n")
-#tprint(tn.read_all().decode('ascii'))
-#tn.close()
-'''
