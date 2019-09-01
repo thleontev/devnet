@@ -3,6 +3,10 @@ import time
 import re
 import textfsm
 
+import yaml
+from pprint import pprint
+
+
 DEV_COUNT = 3
 DELAY_SCR = 1000
 TFTP_SERVER = "10.10.11.3"
@@ -46,6 +50,11 @@ class cdevice(telnetlib.Telnet):
 
     def open(self):
         super().open(self.ip_add, 23, 5)
+
+with open('info.yaml') as f:
+    templates = yaml.load(f)
+
+pprint(templates)
 
 
 i =0
