@@ -55,8 +55,6 @@ with open('software.yaml') as f:
     for doc in docs:
         models = doc
 
-if LOGGINING:
-    flog = open('log.txt', 'w')
 
 device = CDevice(ipaddress[0])
 devices.append(device)
@@ -69,6 +67,9 @@ except:
     device.status = "error_connect"
 
 # check connection status !
+
+if LOGGINING:
+    flog = open("log_"+device.ip_add+".txt", 'w')
 
 #check init config (for com)
 time.sleep(DELAY)
@@ -143,20 +144,58 @@ script = template.render(dev_temp).split("\n")
 
 # perform script
 device.write(b"\n")
+res = device.read_very_eager().decode('ascii')
+fwait = False
+fconfirm = True
 for line in script:
     if line.find("!@") != -1:
-        device.status = line
-        print(device.status)
+        if line.find(":"):
+            cmd = line[2:line.find(":")]
+            arg = line[line.find(":")+1:]
+            if cmd == 'section':
+                device.status = cmd+":"+arg
+                print(device.status)
+            if cmd == 'wait':
+                fwait = False
+                floop = True
+                while floop:
+                    time.sleep(DELAY)
+                    res = device.read_very_eager().decode('ascii').split("\r\n")
+                    for res_line in res:
+                        if res_line.find(arg) == -1:
+                            continue
+                        else:
+                            floop = False
+                            break
+
+            if cmd == 'send':
+                if arg == 'enter':
+                    device.write(b"\r\n")
+
+            if cmd == 'disable':
+                if arg == 'confirm':
+                    fconfirm = False
+
+            if cmd == 'enable':
+                if arg == 'confirm':
+                    fconfirm = True
+                    fwait = False
+
+
     else:
+        while fwait & fconfirm:
+            time.sleep(DELAY)
+            res = device.read_very_eager().decode('ascii').split("\r\n")
+            for res_line in res:
+                if re.search('^[a-zA-Z0-9_.()-]+[#>]', res_line):
+                    fwait = False
+                    break
         device.write(line.encode('ascii') + b"\n")
-        time.sleep(DELAY)
-        res = device.read_very_eager().decode('ascii')
+        fwait = True
         if LOGGINING:
             flog.write("\r\n=== send command ===\r\n")
             flog.write(line)
-            flog.write("\r\n=== receive answer ===\r\n")
-            flog.write(res)
-
+            print(line)
 
 # report info
 print("######## status report ########")

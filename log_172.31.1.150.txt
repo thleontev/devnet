@@ -1,116 +1,67 @@
-{% set CONNTYPECOM = false -%}
-{% if CONNTYPECOM is sameas true %}
-!@section:nvram
-en
-erase /all nvram:
-!@wait:confirm
-!@send:enter
-!@wait:complete
-!@send:enter
-!@wait:#
 
-!@section:conf
+=== send command ===
+
+=== send command ===
+
+=== send command ===
 conf t
-no hostname
-{% if CONNTYPECOM is sameas true %}
-int vl 1
-ip add {{IP}} 255.255.255.0
-no sh
-exit
-{% else %}
-{% endif %}
-no sp vl 1
-ena sec nag
-line vty 0 4
-pass nag
-exit
-{% else %}
-{% endif %}
-conf t
-!@disable:confirm
+=== send command ===
 banner motd ^
+=== send command ===
 #################################################################
+=== send command ===
 #Our company is glad to work with You.                          #
+=== send command ===
 #                                                               #
+=== send command ===
 #We are always ready to help and support you in your work aimed #
+=== send command ===
 #at the creation of the reliable telecommunication systems.     #
+=== send command ===
 #We look forward for our further collaboration.                 #
+=== send command ===
 #                                                               #
+=== send command ===
 #If you require any further information or support, please do   #
+=== send command ===
 #not hesitate to contact us.                                    #
+=== send command ===
 #                                                               #
+=== send command ===
 #Sincerely yours NAG Telecom.                                   #
+=== send command ===
 #                                                               #
+=== send command ===
 #Tel/Fax: +7(343)379-98-38                                      #
+=== send command ===
 #Email: info@nag.ru                                             #
+=== send command ===
 #Web: shop.nag.ru                                               #
+=== send command ===
 #Address: Russia, 620026, Ekaterinburg, Building 57/2,          #
+=== send command ===
 #         Predelnaya st.                                        #
+=== send command ===
 #                                                               #
+=== send command ===
 #default ip address: 10.10.10.1 255.255.255.0                   #
+=== send command ===
 #default login: nag                                             #
+=== send command ===
 #default password :nag                                          #
+=== send command ===
 #################################################################
+=== send command ===
 ^
-!@enable:confirm
+=== send command ===
 end
+=== send command ===
 wr mem
-!@wait:[OK]
-!@send:enter
+=== send command ===
 
-!@section:erase
+=== send command ===
 erase flash:
-!@send:enter
-!@send:enter
-!@wait:complete
-!@send:enter
+=== send command ===
 
-!@section:download
-arc tar /x tftp://{{FILE}} flash:
-!@wait:[OK
-verify /md5 flash:{{PATH}}
-!@check:md5
-
-!@section:reload
-conf t
-{% if CONNTYPECOM is sameas true %}
-int vl 1
-ip add 10.10.10.1 255.255.255.0
-{% else %}
-{% endif %}
-exit
-boot system flash:/{{PATH}}
-end
-wr mem
-!@wait:[OK]
-!@send:enter
-reload
-!@wait:confirm
-!@send:enter
-!@wait:complete
-!@send:enter
-!@wait:connect
-
-
-!@section:log
-en
-sh ver
-!wait:more
-!@send:backspace
-!wait:more
-!@send:backspace
-!@send:enter
-
-sh env all
-!wait:more
-!@send:backspace
-
-sh post
-!wait:more
-!@send:backspace
-!wait:more
-!@send:backspace
-sh swi stack-ports
-dir
-
-
+=== send command ===
+arc tar /x tftp://10.10.11.3/c3750-advipservicesk9-tar.122-46.SE.tar flash:
