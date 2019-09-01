@@ -3,6 +3,7 @@ import time
 import re
 import textfsm
 import yaml
+from jinja2 import Environment, FileSystemLoader
 
 
 # constatns
@@ -12,24 +13,29 @@ TFTP_SERVER = "10.10.11.3"
 PASS_AUTH = "cisco"
 PASS_ENA = "cisco"
 DELAY = 0.5
+CONN_TYPE_COM = True
+LOGGINING = True
 
 # variables
 devices = []     # list of pointers at object CDevice
 ipaddress = []   # list of ip address devices
-models = dict()   # dictionary of compatible device models and software versions
+models = dict()  # dictionary of compatible device models and software versions
 
 class CDevice(telnetlib.Telnet):
     ip_add = ""
     pos = 0
-    link = "none"
+    script = "none"
     model = "none"
     software = "none"
+    file = "none"
     status = "none"
-    update_ios = False
+    update_soft = False
+    logginig = False
 
     def __init__(self, ip_add):
         self.ip_add = ip_add
         telnetlib.Telnet.__init__(self)
+
 
     def __del__(self):
         super().__del__()
@@ -49,7 +55,8 @@ with open('software.yaml') as f:
     for doc in docs:
         models = doc
 
-
+if LOGGINING:
+    flog = open('log.txt', 'w')
 
 device = CDevice(ipaddress[0])
 devices.append(device)
@@ -57,6 +64,7 @@ devices.append(device)
 # connect to device
 try:
     device.open()
+    device.status = "connect_success"
 except:
     device.status = "error_connect"
 
@@ -114,8 +122,45 @@ fsm = textfsm.TextFSM(template)
 result = fsm.ParseText(res)
 device.software = result[0][6]
 
+# cheat
+device.model = 'WS-C3750G-24TS-S1U'
+
+# find script
+if device.software != models['WS-C3750G-24TS-S1U']['software']:
+    device.software = models['WS-C3750G-24TS-S1U']['software']
+    device.script = models['WS-C3750G-24TS-S1U']['script']
+    device.file = models['WS-C3750G-24TS-S1U']['file']
+    device.update_soft = True
+
+# fill template
+file = TFTP_SERVER+"/" + device.file
+path = device.software[:re.search('.bin', device.software).start()]+"/"+device.software
+dev_temp = {'IP':device.ip_add, 'FILE': file, 'PATH': path}
+
+env = Environment(loader=FileSystemLoader('templates'))
+template = env.get_template(device.script)
+script = template.render(dev_temp).split("\n")
+
+# perform script
+device.write(b"\n")
+for line in script:
+    if line.find("!@") != -1:
+        device.status = line
+        print(device.status)
+    else:
+        device.write(line.encode('ascii') + b"\n")
+        time.sleep(DELAY)
+        res = device.read_very_eager().decode('ascii')
+        if LOGGINING:
+            flog.write("\r\n=== send command ===\r\n")
+            flog.write(line)
+            flog.write("\r\n=== receive answer ===\r\n")
+            flog.write(res)
+
+
 # report info
 print("######## status report ########")
 print("IP address", "Model", "Software", "Status")
 print(device.ip_add, device.model, device.status)
 
+flog.close()

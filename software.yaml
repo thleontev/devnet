@@ -1,7 +1,6 @@
 # list of compatible device models and software versions
-WS-C3750:
-  software: c3750-advipservicesk9-mz.122-46.SE.bin
-  script: scr3750.txt
 WS-C3750G-24TS-S1U:
-  software: c3750-advipservicesk9-mz.122-46.SE.bin
   script: scr3750.txt
+  software: c3750-advipservicesk9-mz.122-46.SE.bin
+  file: c3750-advipservicesk9-tar.122-46.SE.tar
+  md5: 134123412341234123

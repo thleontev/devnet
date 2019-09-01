@@ -1,0 +1,300 @@
+
+=== send command ===
+en
+=== receive answer ===
+        
+R2#en
+R2#
+=== send command ===
+erase /all nvram:
+=== receive answer ===
+erase /all nvram:
+Erasing the nvram filesystem will remove all files! Continue? [confirm]
+=== send command ===
+
+=== receive answer ===
+
+[OK]
+Erase of nvram: complete
+R2#
+=== send command ===
+conf t
+=== receive answer ===
+conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R2(config)#
+=== send command ===
+no hostname
+=== receive answer ===
+no hostname
+Router(config)#
+=== send command ===
+
+=== receive answer ===
+
+Router(config)#
+=== send command ===
+
+=== receive answer ===
+
+Router(config)#
+=== send command ===
+no sp vl 1
+=== receive answer ===
+no sp vl 1
+Router(config)#
+=== send command ===
+ena sec nag
+=== receive answer ===
+ena sec nag
+Router(config)#
+=== send command ===
+line vty 0 4
+=== receive answer ===
+line vty 0 4
+Router(config-line)#
+=== send command ===
+pass nag
+=== receive answer ===
+pass nag
+Router(config-line)#
+=== send command ===
+exit
+=== receive answer ===
+exit
+Router(config)#
+=== send command ===
+banner motd ^
+=== receive answer ===
+banner motd ^
+Enter TEXT message.  End with the character '^'.
+
+=== send command ===
+Enter TEXT message.  End with the character '^'
+=== receive answer ===
+Enter TEXT message.  End with the character '^'
+Router(config)#
+=== send command ===
+#################################################################
+=== receive answer ===
+##############################################################$####################################################         ##
+Router(config)#
+=== send command ===
+#Our company is glad to work with You.                          #
+=== receive answer ===
+#Our company is glad to work with You.                        $y is glad to work with You.                                   #
+Router(config)#
+=== send command ===
+#                                                               #
+=== receive answer ===
+#                                                             $                                                              #
+Router(config)#
+=== send command ===
+#We are always ready to help and support you in your work aimed #
+=== receive answer ===
+#We are always ready to help and support you in your work aime$ays ready to help and support you in your work aimed          #
+Router(config)#
+=== send command ===
+#at the creation of the reliable telecommunication systems.     #
+=== receive answer ===
+#at the creation of the reliable telecommunication systems.   $ation of the reliable telecommunication systems.              #
+Router(config)#
+=== send command ===
+#We look forward for our further collaboration.                 #
+=== receive answer ===
+#We look forward for our further collaboration.               $rward for our further collaboration.                          #
+Router(config)#
+=== send command ===
+#                                                               #
+=== receive answer ===
+#                                                             $                                                              #
+Router(config)#
+=== send command ===
+#If you require any further information or support, please do   #
+=== receive answer ===
+#If you require any further information or support, please do $uire any further information or support, please do            #
+Router(config)#
+=== send command ===
+#not hesitate to contact us.                                    #
+=== receive answer ===
+#not hesitate to contact us.                                  $te to contact us.                                             #
+Router(config)#
+=== send command ===
+#                                                               #
+=== receive answer ===
+#                                                             $                                                              #
+Router(config)#
+=== send command ===
+#Sincerely yours NAG Telecom.                                   #
+=== receive answer ===
+#Sincerely yours NAG Telecom.                                 $yours NAG Telecom.                                            #
+Router(config)#
+=== send command ===
+#                                                               #
+=== receive answer ===
+#                                                             $                                                              #
+Router(config)#
+=== send command ===
+#Tel/Fax: +7(343)379-98-38                                      #
+=== receive answer ===
+#Tel/Fax: +7(343)379-98-38                                    $7(343)379-98-38                                               #
+Router(config)#
+=== send command ===
+#Email: info@nag.ru                                             #
+=== receive answer ===
+#Email: info@nag.ru                                           $o@nag.ru                                                      #
+Router(config)#
+=== send command ===
+#Web: shop.nag.ru                                               #
+=== receive answer ===
+#Web: shop.nag.ru                                             $nag.ru                                                        #
+Router(config)#
+=== send command ===
+#Address: Russia, 620026, Ekaterinburg, Building 57/2,          #
+=== receive answer ===
+#Address: Russia, 620026, Ekaterinburg, Building 57/2,        $ussia, 620026, Ekaterinburg, Building 57/2,                   #
+Router(config)#
+=== send command ===
+#         Predelnaya st.                                        #
+=== receive answer ===
+#         Predelnaya st.                                      $redelnaya st.                                                 #
+Router(config)#
+=== send command ===
+#                                                               #
+=== receive answer ===
+#                                                             $                                                              #
+Router(config)#
+=== send command ===
+#default ip address: 10.10.10.1 255.255.255.0                   #
+=== receive answer ===
+#default ip address: 10.10.10.1 255.255.255.0                 $ address: 10.10.10.1 255.255.255.0                            #
+Router(config)#
+=== send command ===
+#default login: nag                                             #
+=== receive answer ===
+#default login: nag                                           $gin: nag                                                      #
+Router(config)#
+=== send command ===
+#default password :nag                                          #
+=== receive answer ===
+#default password :nag                                        $ssword :nag                                                   #
+Router(config)#
+=== send command ===
+#################################################################
+=== receive answer ===
+##############################################################$####################################################         ##
+Router(config)#
+=== send command ===
+^
+=== receive answer ===
+^
+               ^
+% Invalid input detected at '^' marker.
+
+Router(config)#
+=== send command ===
+end
+=== receive answer ===
+end
+Router#
+=== send command ===
+wr mem
+=== receive answer ===
+wr mem
+Building configuration...
+
+=== send command ===
+
+=== receive answer ===
+[OK]
+Router#
+Router#
+=== send command ===
+erase flash:
+=== receive answer ===
+erase flash:
+Erasing the flash filesystem will remove all files! Continue? [confirm]
+=== send command ===
+
+=== receive answer ===
+
+
+Erasing device... eeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+=== send command ===
+arc tar /x tftp://10.10.11.3/c3750-advipservicesk9-tar.122-46.SE.tar flash:
+=== receive answer ===
+ee ...erased
+Erase of flash: complete
+Router#arc tar /x tftp://10.10.11.3/c3750-advipservicesk9-tar.122-46.SE.tar f$tftp://10.10.11.3/c3750-advipservicesk9-tar.122-46.SE.tar fl         ash:
+
+=== send command ===
+verify /md5 flash:c3750-advipservicesk9-mz.122-46.SE/c3750-advipservicesk9-mz.122-46.SE.bin
+=== receive answer ===
+
+=== send command ===
+
+=== receive answer ===
+
+=== send command ===
+conf t
+=== receive answer ===
+
+=== send command ===
+
+=== receive answer ===
+
+=== send command ===
+
+=== receive answer ===
+
+=== send command ===
+exit
+=== receive answer ===
+
+=== send command ===
+boot system flash:/c3750-advipservicesk9-mz.122-46.SE/c3750-advipservicesk9-mz.122-46.SE.bin
+=== receive answer ===
+
+=== send command ===
+end
+=== receive answer ===
+
+=== send command ===
+wr mem
+=== receive answer ===
+
+=== send command ===
+reload
+=== receive answer ===
+
+=== send command ===
+
+=== receive answer ===
+
+=== send command ===
+en
+=== receive answer ===
+
+=== send command ===
+sh ver
+=== receive answer ===
+
+=== send command ===
+sh env all
+=== receive answer ===
+
+=== send command ===
+sh post
+=== receive answer ===
+
+=== send command ===
+sh swi stack-ports
+=== receive answer ===
+
+=== send command ===
+dir
+=== receive answer ===
+
+=== send command ===
+
+=== receive answer ===

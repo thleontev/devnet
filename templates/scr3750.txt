@@ -1,0 +1,113 @@
+{% set CONNTYPECOM = false -%}
+!@nvram
+en
+erase /all nvram:
+!@wait:confirm
+!@send:enter
+!@wait:complete
+!@send:enter
+!@wait:#
+
+!@conf
+conf t
+no hostname
+{% if CONNTYPECOM is sameas true %}
+int vl 1
+ip add {{IP}} 255.255.255.0
+no sh
+exit
+{% else %}
+{% endif %}
+no sp vl 1
+ena sec nag
+line vty 0 4
+pass nag
+exit
+banner motd ^
+Enter TEXT message.  End with the character '^'
+#################################################################
+#Our company is glad to work with You.                          #
+#                                                               #
+#We are always ready to help and support you in your work aimed #
+#at the creation of the reliable telecommunication systems.     #
+#We look forward for our further collaboration.                 #
+#                                                               #
+#If you require any further information or support, please do   #
+#not hesitate to contact us.                                    #
+#                                                               #
+#Sincerely yours NAG Telecom.                                   #
+#                                                               #
+#Tel/Fax: +7(343)379-98-38                                      #
+#Email: info@nag.ru                                             #
+#Web: shop.nag.ru                                               #
+#Address: Russia, 620026, Ekaterinburg, Building 57/2,          #
+#         Predelnaya st.                                        #
+#                                                               #
+#default ip address: 10.10.10.1 255.255.255.0                   #
+#default login: nag                                             #
+#default password :nag                                          #
+#################################################################
+^
+end
+wr mem
+!@wait:[OK]
+!@send:enter
+!@wait:#
+
+!@erase
+erase flash:
+!@wait:complete
+!@wait:#
+
+!@download
+arc tar /x tftp://{{FILE}} flash:
+!@wait:[OK
+!@wait:#
+verify /md5 flash:{{PATH}}
+!@wait:#
+!@checkmd5
+
+!@reload
+conf t
+{% if CONNTYPECOM is sameas true %}
+int vl 1
+ip add 10.10.10.1 255.255.255.0
+{% else %}
+{% endif %}
+exit
+boot system flash:/{{PATH}}
+end
+wr mem
+!@wait:[OK]
+!@send:enter
+!@wait:#
+reload
+!@wait:confirm
+!@send:enter
+!@wait:complete
+!@send:enter
+!@wait:connect
+
+
+!@log
+en
+sh ver
+!wait:more
+!@send:backspace
+!wait:more
+!@send:backspace
+!@send:enter
+
+sh env all
+!wait:more
+!@send:backspace
+
+sh post
+!wait:more
+!@send:backspace
+!wait:more
+!@send:backspace
+sh swi stack-ports
+dir
+
+
