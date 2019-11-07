@@ -1,3 +1,4 @@
+!@connect:start
 {% set CONNTYPECOM = false -%}
 {% if CONNTYPECOM is sameas true %}
 !@section:nvram
@@ -62,7 +63,6 @@ wr mem
 erase flash:
 y
 !@send:enter
-!@send:enter
 !@wait:complete
 !@send:enter
 
@@ -90,27 +90,13 @@ reload
 !@send:enter
 !@wait:complete
 !@send:enter
-!@wait:connect
 
-
+!@connect:restore
 !@section:log
 en
 sh ver
-!wait:more
-!@send:backspace
-!wait:more
-!@send:backspace
-!@send:enter
-
 sh env all
-!wait:more
-!@send:backspace
-
 sh post
-!wait:more
-!@send:backspace
-!wait:more
-!@send:backspace
 sh swi stack-ports
 dir
 
