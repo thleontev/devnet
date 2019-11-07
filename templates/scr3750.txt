@@ -27,7 +27,7 @@ exit
 {% else %}
 {% endif %}
 conf t
-!@disable:confirm
+!@confirm:disable
 banner motd ^
 #################################################################
 #Our company is glad to work with You.                          #
@@ -52,7 +52,7 @@ banner motd ^
 #default password :nag                                          #
 #################################################################
 ^
-!@enable:confirm
+!@confirm:enable
 end
 wr mem
 !@wait:[OK]
@@ -60,6 +60,7 @@ wr mem
 
 !@section:erase
 erase flash:
+y
 !@send:enter
 !@send:enter
 !@wait:complete

@@ -172,12 +172,12 @@ for line in script:
                 if arg == 'enter':
                     device.write(b"\r\n")
 
-            if cmd == 'disable':
-                if arg == 'confirm':
+            if cmd == 'confirm':
+                if arg == 'disable':
                     fconfirm = False
 
-            if cmd == 'enable':
-                if arg == 'confirm':
+            if cmd == 'confirm':
+                if arg == 'enable':
                     fconfirm = True
                     fwait = False
 
