@@ -63,6 +63,7 @@ if LOGGINING:
 # perform script
 fwait = False
 fconfirm = True
+script= ["!@connect:start", "let's go"]
 for line in script:
     if line.find("!@") != -1:
         if line.find(":"):
@@ -76,6 +77,7 @@ for line in script:
                         device.status = "connect_success"
                     except:
                         device.status = "error_connect"
+                        break
 
                     # check init config (for com)
                     time.sleep(DELAY)
